@@ -1,26 +1,62 @@
-import { Injectable } from '@nestjs/common';
-import { CreateBranchDto } from './dto/create-branch.dto';
-import { UpdateBranchDto } from './dto/update-branch.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { CreateBranchDto, UpdateBranchDto } from './dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Branch } from './entities/branch.entity';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class BranchService {
-  create(createBranchDto: CreateBranchDto) {
-    return 'This action adds a new branch';
+  constructor(
+    @InjectRepository(Branch)
+    private readonly branchRepository: Repository<Branch>,
+  ) {}
+
+  async create(createBranchDto: CreateBranchDto) {
+    const newBranch = await this.branchRepository.save(createBranchDto);
+    return plainToClass(CreateBranchDto, newBranch);
   }
 
-  findAll() {
-    return `This action returns all branch`;
+  async findAll() {
+    const branches = await this.branchRepository.find({
+      // relations: ['direction', 'contact'],
+    });
+    return branches;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} branch`;
+  async findOne(id: number) {
+    const branch = await this.branchRepository.findOne({
+      where: { id_branch: id },
+    });
+
+    if (!branch) {
+      throw new BadRequestException(
+        `Branch not found in database with id:${id}`,
+      );
+    }
+
+    return plainToClass(CreateBranchDto, branch);
   }
 
-  update(id: number, updateBranchDto: UpdateBranchDto) {
-    return `This action updates a #${id} branch`;
+  async update(id: number, updateBranchDto: UpdateBranchDto) {
+    const branch = await this.findOne(id);
+    const updatedBranch = await this.branchRepository.save({
+      ...branch,
+      ...updateBranchDto,
+    });
+    return plainToClass(UpdateBranchDto, updatedBranch);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} branch`;
+  async remove(id: number) {
+    const branch = await this.findOne(id);
+
+    if (!branch) {
+      throw new BadRequestException(
+        `Branch not found in database with id:${id}`,
+      );
+    }
+
+    await this.branchRepository.delete(id);
+    return { message: 'Branch deleted successfully' };
   }
 }

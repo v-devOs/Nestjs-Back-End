@@ -1,26 +1,59 @@
-import { Injectable } from '@nestjs/common';
-import { CreateContactDto } from './dto/create-contact.dto';
-import { UpdateContactDto } from './dto/update-contact.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Contact } from './entities/contact.entity';
+import { Repository } from 'typeorm';
+import { CreateContactDto, UpdateContactDto } from './dto';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class ContactService {
-  create(createContactDto: CreateContactDto) {
-    return 'This action adds a new contact';
+  constructor(
+    @InjectRepository(Contact)
+    private readonly contactRepository: Repository<Contact>,
+  ) {}
+
+  async create(createContactDto: CreateContactDto) {
+    const newContact = await this.contactRepository.save(createContactDto);
+    return plainToClass(CreateContactDto, newContact);
   }
 
-  findAll() {
-    return `This action returns all contact`;
+  async findAll() {
+    const contacts = await this.contactRepository.find();
+    return contacts.map((contact) => plainToClass(CreateContactDto, contact));
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} contact`;
+  async findOne(id: number) {
+    const contact = await this.contactRepository.findOne({
+      where: { id_contact: id },
+    });
+
+    if (!contact) {
+      throw new BadRequestException(
+        `Contact not found in database with id:${id}`,
+      );
+    }
+    return plainToClass(CreateContactDto, contact);
   }
 
-  update(id: number, updateContactDto: UpdateContactDto) {
-    return `This action updates a #${id} contact`;
+  async update(id: number, updateContactDto: UpdateContactDto) {
+    const contact = await this.findOne(id);
+    const updatedContact = await this.contactRepository.save({
+      ...contact,
+      ...updateContactDto,
+    });
+    return plainToClass(UpdateContactDto, updatedContact);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} contact`;
+  async remove(id: number) {
+    const contact = await this.findOne(id);
+
+    if (!contact) {
+      throw new BadRequestException(
+        `Contact not found in database with id:${id}`,
+      );
+    }
+
+    await this.contactRepository.delete(id);
+    return { message: 'Contact successfully removed' };
   }
 }

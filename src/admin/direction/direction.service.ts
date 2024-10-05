@@ -15,12 +15,14 @@ export class DirectionService {
   async create(createDirectionDto: CreateDirectionDto) {
     const newDirection =
       await this.directionRepository.save(createDirectionDto);
-    return plainToClass(Direction, newDirection);
+    return plainToClass(CreateDirectionDto, newDirection);
   }
 
   async findAll() {
     const directions = await this.directionRepository.find();
-    return directions.map((direction) => plainToClass(Direction, direction));
+    return directions.map((direction) =>
+      plainToClass(CreateDirectionDto, direction),
+    );
   }
 
   async findOne(id: number) {
@@ -31,7 +33,7 @@ export class DirectionService {
     if (!direction) {
       throw new BadRequestException('Direction not found in database');
     }
-    return plainToClass(Direction, direction);
+    return plainToClass(CreateDirectionDto, direction);
   }
 
   async update(id: number, updateDirectionDto: UpdateDirectionDto) {
@@ -40,7 +42,7 @@ export class DirectionService {
       ...direction,
       ...updateDirectionDto,
     });
-    return plainToClass(Direction, updatedDirection);
+    return plainToClass(UpdateDirectionDto, updatedDirection);
   }
 
   async remove(id: number) {
