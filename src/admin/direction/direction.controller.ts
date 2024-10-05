@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { DirectionService } from './direction.service';
 import { CreateDirectionDto } from './dto/create-direction.dto';
 import { UpdateDirectionDto } from './dto/update-direction.dto';
@@ -8,8 +17,8 @@ export class DirectionController {
   constructor(private readonly directionService: DirectionService) {}
 
   @Post()
-  create(@Body() createDirectionDto: CreateDirectionDto) {
-    return this.directionService.create(createDirectionDto);
+  async create(@Body() createDirectionDto: CreateDirectionDto) {
+    return await this.directionService.create(createDirectionDto);
   }
 
   @Get()
@@ -18,13 +27,16 @@ export class DirectionController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.directionService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.directionService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDirectionDto: UpdateDirectionDto) {
-    return this.directionService.update(+id, updateDirectionDto);
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateDirectionDto: UpdateDirectionDto,
+  ) {
+    return this.directionService.update(id, updateDirectionDto);
   }
 
   @Delete(':id')

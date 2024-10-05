@@ -3,46 +3,26 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { DirectionModule } from './admin/direction/direction.module';
-import { ContactModule } from './admin/contact/contact.module';
-import { BranchModule } from './admin/branch/branch.module';
-import { StorageModule } from './manager/storage/storage.module';
-import { EmployeeModule } from './manager/employee/employee.module';
-import { OrderModule } from './manager/order/order.module';
-import { ProductModule } from './manager/product/product.module';
-import { UserModule } from './common/user/user.module';
-import { ProductStorageModule } from './manager/product_storage/product_storage.module';
-import { OrderDetailsModule } from './manager/order_details/order_details.module';
-import { SaleDetailsModule } from './common/sale_details/sale_details.module';
+import { DataSource } from 'typeorm';
+import { typeOrmConfig } from './config/typeorm.config';
+
+import * as AdminModules from './admin';
+import * as ManagerModules from './manager';
+import * as CommonModules from './common';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DATABASE_HOST,
-      port: parseInt(process.env.DATABASE_PORT, 10),
-      username: process.env.DATABASE_USER,
-      password: process.env.DATABASE_PASSWORD,
-      database: process.env.DATABASE_NAME,
-      entities: [],
-      synchronize: true,
-    }),
-    DirectionModule,
-    ContactModule,
-    BranchModule,
-    StorageModule,
-    EmployeeModule,
-    OrderModule,
-    ProductModule,
-    UserModule,
-    ProductStorageModule,
-    OrderDetailsModule,
-    SaleDetailsModule,
+    TypeOrmModule.forRoot(typeOrmConfig),
+    ...Object.values(AdminModules),
+    ...Object.values(ManagerModules),
+    ...Object.values(CommonModules),
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private dataSource: DataSource) {}
+}
