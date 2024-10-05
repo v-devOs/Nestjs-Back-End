@@ -1,26 +1,49 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { CreateBranchDto, UpdateBranchDto } from './dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Branch } from './entities/branch.entity';
 import { plainToClass } from 'class-transformer';
+import { DirectionService } from '../direction/direction.service';
+import { ContactService } from '../contact/contact.service';
 
 @Injectable()
 export class BranchService {
   constructor(
     @InjectRepository(Branch)
     private readonly branchRepository: Repository<Branch>,
+    @Inject(forwardRef(() => DirectionService))
+    private readonly directionService: DirectionService,
+    @Inject(forwardRef(() => ContactService))
+    private readonly contactService: ContactService,
   ) {}
 
   async create(createBranchDto: CreateBranchDto) {
-    const newBranch = await this.branchRepository.save(createBranchDto);
-    return plainToClass(CreateBranchDto, newBranch);
+    // const newBranch = await this.branchRepository.save(createBranchDto);
+    const direction = await this.directionService.findOne(
+      createBranchDto.id_direction,
+    );
+    const contact = await this.contactService.findOne(
+      createBranchDto.id_contact,
+    );
+
+    const newBranch = await this.branchRepository.save({
+      ...createBranchDto,
+      direction,
+      contact,
+    });
+
+    return newBranch;
   }
 
   async findAll() {
-    const branches = await this.branchRepository.find({
-      // relations: ['direction', 'contact'],
-    });
+    const branches = await this.branchRepository.find();
+
     return branches;
   }
 
