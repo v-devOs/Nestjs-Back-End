@@ -8,6 +8,9 @@ export class Direction {
   @Column({ nullable: true })
   zone: string;
 
+  @Column({ default: true })
+  active: boolean;
+
   @Column({ nullable: true })
   street: string;
 }

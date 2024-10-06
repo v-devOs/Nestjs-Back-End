@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class CreateDirectionDto {
   @IsString()
@@ -6,4 +6,8 @@ export class CreateDirectionDto {
 
   @IsString()
   street: string;
+
+  @IsBoolean()
+  @IsOptional()
+  active: boolean;
 }

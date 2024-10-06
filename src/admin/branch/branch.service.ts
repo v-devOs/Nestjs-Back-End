@@ -44,7 +44,17 @@ export class BranchService {
   async findAll() {
     const branches = await this.branchRepository.find();
 
-    return branches;
+    return branches.map((branch) => {
+      const newBranch = {
+        ...branch,
+        id_direction: branch.direction.id_direction,
+        id_contact: branch.contact.id_contact,
+      };
+
+      delete newBranch.direction;
+      delete newBranch.contact;
+      return newBranch;
+    });
   }
 
   async findOne(id: number) {
@@ -52,7 +62,7 @@ export class BranchService {
       where: { id_branch: id },
     });
 
-    if (!branch) {
+    if (!branch || !branch.active) {
       throw new BadRequestException(
         `Branch not found in database with id:${id}`,
       );
@@ -79,7 +89,10 @@ export class BranchService {
       );
     }
 
-    await this.branchRepository.delete(id);
+    await this.branchRepository.save({
+      ...branch,
+      active: false,
+    });
     return { message: 'Branch deleted successfully' };
   }
 }

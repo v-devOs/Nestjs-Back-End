@@ -16,4 +16,7 @@ export class Contact {
 
   @Column()
   facebook: string;
+
+  @Column({ default: true })
+  active: boolean;
 }

@@ -30,7 +30,7 @@ export class DirectionService {
       where: { id_direction: id },
     });
 
-    if (!direction) {
+    if (!direction || !direction.active) {
       throw new BadRequestException('Direction not found in database');
     }
     return plainToClass(CreateDirectionDto, direction);
@@ -52,7 +52,11 @@ export class DirectionService {
       throw new BadRequestException('Direction dont remove');
     }
 
-    await this.directionRepository.delete(id);
+    await this.directionRepository.save({
+      ...direction,
+      active: false,
+    });
+
     return { message: 'Direction successfully removed' };
   }
 }

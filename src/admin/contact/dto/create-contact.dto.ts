@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateContactDto {
   @IsString()
@@ -16,4 +16,8 @@ export class CreateContactDto {
   @IsString()
   @IsNotEmpty()
   facebook: string;
+
+  @IsBoolean()
+  @IsOptional()
+  active: boolean;
 }

@@ -47,13 +47,17 @@ export class ContactService {
   async remove(id: number) {
     const contact = await this.findOne(id);
 
-    if (!contact) {
+    if (!contact || !contact.active) {
       throw new BadRequestException(
         `Contact not found in database with id:${id}`,
       );
     }
 
-    await this.contactRepository.delete(id);
+    await this.contactRepository.save({
+      ...contact,
+      active: false,
+    });
+
     return { message: 'Contact successfully removed' };
   }
 }
