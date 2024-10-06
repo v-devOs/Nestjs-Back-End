@@ -57,7 +57,7 @@ export class StorageService {
       },
     });
 
-    if (!storage) {
+    if (!storage || !storage.active) {
       throw new BadRequestException(
         `Storage not found in database with id:${id}`,
       );
@@ -83,6 +83,19 @@ export class StorageService {
   }
 
   async remove(id: number) {
-    return `This action removes a #${id} storage`;
+    const storage = await this.findOne(id);
+
+    if (!storage || !storage.active) {
+      throw new BadRequestException(
+        `Storage not found in database with id:${id}`,
+      );
+    }
+
+    await this.storageRepository.save({
+      ...storage,
+      active: false,
+    });
+
+    return { message: 'Storage deleted successfully' };
   }
 }

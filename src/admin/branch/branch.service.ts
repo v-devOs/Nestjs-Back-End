@@ -93,6 +93,7 @@ export class BranchService {
       ...branch,
       active: false,
     });
+
     return { message: 'Branch deleted successfully' };
   }
 }
