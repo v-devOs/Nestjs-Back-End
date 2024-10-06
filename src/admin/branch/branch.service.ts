@@ -58,7 +58,7 @@ export class BranchService {
       );
     }
 
-    return plainToClass(CreateBranchDto, branch);
+    return branch;
   }
 
   async update(id: number, updateBranchDto: UpdateBranchDto) {

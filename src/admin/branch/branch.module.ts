@@ -14,5 +14,6 @@ import { ContactModule } from '../contact/contact.module';
   ],
   controllers: [BranchController],
   providers: [BranchService],
+  exports: [BranchService],
 })
 export class BranchModule {}

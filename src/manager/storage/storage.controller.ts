@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { StorageService } from './storage.service';
 import { CreateStorageDto } from './dto/create-storage.dto';
 import { UpdateStorageDto } from './dto/update-storage.dto';
@@ -18,17 +27,20 @@ export class StorageController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseIntPipe) id: number) {
     return this.storageService.findOne(+id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateStorageDto: UpdateStorageDto) {
-    return this.storageService.update(+id, updateStorageDto);
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateStorageDto: UpdateStorageDto,
+  ) {
+    return this.storageService.update(id, updateStorageDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.storageService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.storageService.remove(id);
   }
 }
