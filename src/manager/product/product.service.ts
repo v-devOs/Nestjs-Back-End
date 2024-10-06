@@ -1,26 +1,53 @@
-import { Injectable } from '@nestjs/common';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { CreateProductDto, UpdateProductDto } from './dto';
+import { Product } from './entities/product.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ProductService {
-  create(createProductDto: CreateProductDto) {
-    return 'This action adds a new product';
+  constructor(
+    @InjectRepository(Product)
+    private readonly productRepository: Repository<Product>,
+  ) {}
+
+  async create(createProductDto: CreateProductDto) {
+    const product = await this.productRepository.save(createProductDto);
+    return product;
   }
 
-  findAll() {
-    return `This action returns all product`;
+  async findAll() {
+    const products = await this.productRepository.find();
+    return products.filter((product) => product.active);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  async findOne(id: number) {
+    const product = await this.productRepository.findOne({
+      where: { id_product: id, active: true },
+    });
+
+    if (!product) {
+      throw new BadRequestException('Product not found with id: ' + id);
+    }
+
+    return product;
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(id: number, updateProductDto: UpdateProductDto) {
+    const product = await this.findOne(id);
+
+    return this.productRepository.save({ ...product, ...updateProductDto });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove(id: number) {
+    const product = await this.findOne(id);
+
+    if (!product) {
+      throw new BadRequestException('Product not found with id: ' + id);
+    }
+
+    await this.productRepository.save({ ...product, active: false });
+
+    return { message: 'Product deleted successfully' };
   }
 }

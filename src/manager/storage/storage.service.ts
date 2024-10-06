@@ -37,16 +37,18 @@ export class StorageService {
       },
     });
 
-    return storages.map((storage) => {
-      const newStorage = {
-        ...storage,
-        id_branch: storage.branch.id_branch,
-      };
+    return storages
+      .map((storage) => {
+        const newStorage = {
+          ...storage,
+          id_branch: storage.branch.id_branch,
+        };
 
-      delete newStorage.branch;
+        delete newStorage.branch;
 
-      return newStorage;
-    });
+        return newStorage;
+      })
+      .filter((storage) => storage.active);
   }
 
   async findOne(id: number) {

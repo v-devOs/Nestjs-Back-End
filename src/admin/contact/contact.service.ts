@@ -19,7 +19,7 @@ export class ContactService {
 
   async findAll() {
     const contacts = await this.contactRepository.find();
-    return contacts.map((contact) => plainToClass(CreateContactDto, contact));
+    return contacts.filter((contact) => contact.active);
   }
 
   async findOne(id: number) {

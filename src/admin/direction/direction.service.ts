@@ -20,9 +20,7 @@ export class DirectionService {
 
   async findAll() {
     const directions = await this.directionRepository.find();
-    return directions.map((direction) =>
-      plainToClass(CreateDirectionDto, direction),
-    );
+    return directions.filter((direction) => direction.active);
   }
 
   async findOne(id: number) {

@@ -44,17 +44,19 @@ export class BranchService {
   async findAll() {
     const branches = await this.branchRepository.find();
 
-    return branches.map((branch) => {
-      const newBranch = {
-        ...branch,
-        id_direction: branch.direction.id_direction,
-        id_contact: branch.contact.id_contact,
-      };
+    return branches
+      .map((branch) => {
+        const newBranch = {
+          ...branch,
+          id_direction: branch.direction.id_direction,
+          id_contact: branch.contact.id_contact,
+        };
 
-      delete newBranch.direction;
-      delete newBranch.contact;
-      return newBranch;
-    });
+        delete newBranch.direction;
+        delete newBranch.contact;
+        return newBranch;
+      })
+      .filter((branch) => branch.active);
   }
 
   async findOne(id: number) {
