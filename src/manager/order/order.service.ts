@@ -1,26 +1,80 @@
-import { Injectable } from '@nestjs/common';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { CreateOrderDto, UpdateOrderDto } from './dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Order } from './entities/order.entity';
+import { Repository } from 'typeorm';
+import { BranchService } from 'src/admin/branch/branch.service';
 
 @Injectable()
 export class OrderService {
-  create(createOrderDto: CreateOrderDto) {
-    return 'This action adds a new order';
+  constructor(
+    @InjectRepository(Order)
+    private readonly orderRepository: Repository<Order>,
+    @Inject(forwardRef(() => BranchService))
+    private readonly branchService: BranchService,
+  ) {}
+
+  async create(createOrderDto: CreateOrderDto) {
+    const branch = await this.branchService.findOne(createOrderDto.id_branch);
+
+    const newOrder = await this.orderRepository.save({
+      ...createOrderDto,
+      branch,
+    });
+
+    return newOrder;
   }
 
-  findAll() {
-    return `This action returns all order`;
+  async findAll() {
+    const orders = await this.orderRepository.find({
+      relations: ['branch'],
+    });
+
+    return orders.map((order) => {
+      const newOrder = {
+        ...order,
+        id_branch: order.branch.id_branch,
+      };
+
+      delete newOrder.branch;
+      return newOrder;
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
+  async findOne(id: number) {
+    const order = await this.orderRepository.findOne({
+      where: { id_order: id },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Order not found with id: ${id}`);
+    }
+
+    return order;
   }
 
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
+  async update(id: number, updateOrderDto: UpdateOrderDto) {
+    const order = await this.findOne(id);
+
+    if (updateOrderDto.id_branch) {
+      const branch = await this.branchService.findOne(updateOrderDto.id_branch);
+      order.branch = branch;
+    }
+
+    const updatedOrder = await this.orderRepository.save({
+      ...order,
+      ...updateOrderDto,
+    });
+
+    return updatedOrder;
   }
 
-  remove(id: number) {
+  async remove(id: number) {
     return `This action removes a #${id} order`;
   }
 }

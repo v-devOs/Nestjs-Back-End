@@ -61,10 +61,10 @@ export class BranchService {
 
   async findOne(id: number) {
     const branch = await this.branchRepository.findOne({
-      where: { id_branch: id },
+      where: { id_branch: id, active: true },
     });
 
-    if (!branch || !branch.active) {
+    if (!branch) {
       throw new BadRequestException(
         `Branch not found in database with id:${id}`,
       );

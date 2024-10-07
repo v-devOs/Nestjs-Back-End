@@ -43,6 +43,9 @@ export class Employee {
   @Column({ default: true })
   active: boolean;
 
+  @Column({ default: 'Empleado' })
+  rol: string;
+
   @ManyToOne(() => Branch)
   @JoinColumn({ name: 'id_branch' })
   branch: Branch;

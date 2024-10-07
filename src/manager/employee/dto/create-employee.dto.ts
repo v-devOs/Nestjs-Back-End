@@ -41,6 +41,11 @@ export class CreateEmployeeDto {
   @IsOptional()
   active: boolean;
 
+  @IsString()
+  @IsOptional()
+  @IsIn(['Admin', 'Empleado', 'Manager', 'Caja'])
+  rol: string;
+
   @IsNumber()
   id_branch: number;
 
