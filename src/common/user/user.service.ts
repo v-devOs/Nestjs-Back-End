@@ -63,17 +63,39 @@ export class UserService {
       throw new NotFoundException('User not found with id: ' + id);
     }
 
-    delete user.employee;
     delete user.password;
 
     return user;
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+    const user = await this.findOne(id);
+
+    if (updateUserDto.id_employee) {
+      const employee = await this.employeeService.findOne(
+        updateUserDto.id_employee,
+      );
+
+      user.employee = employee;
+    }
+
+    const updatedUser = await this.userRepository.save({
+      ...user,
+      ...updateUserDto,
+    });
+
+    delete updatedUser.password;
+
+    return updatedUser;
   }
 
   async remove(id: number) {
-    return `This action removes a #${id} user`;
+    const user = await this.findOne(id);
+
+    user.active = false;
+
+    await this.userRepository.save(user);
+
+    return 'User deleted successfully';
   }
 }
