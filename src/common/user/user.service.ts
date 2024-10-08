@@ -9,7 +9,7 @@ import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EmployeeService } from 'src/manager/employee/employee.service';
-import bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UserService {
@@ -25,7 +25,7 @@ export class UserService {
       createUserDto.id_employee,
     );
 
-    const password = await bcrypt.hashSync(createUserDto.password);
+    const password = bcrypt.hashSync(createUserDto.password);
     const newUser = await this.userRepository.save({
       ...createUserDto,
       employee,
@@ -77,6 +77,11 @@ export class UserService {
       );
 
       user.employee = employee;
+    }
+
+    if (updateUserDto.password) {
+      const newPassword = bcrypt.hashSync(updateUserDto.password);
+      user.password = newPassword;
     }
 
     const updatedUser = await this.userRepository.save({
