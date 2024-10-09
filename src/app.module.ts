@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 import { typeOrmConfig } from './config/typeorm.config';
+import { BcryptModule } from './lib/bcrypt/bcrypt.module';
 
 import * as AdminModules from './admin';
 import * as ManagerModules from './manager';
@@ -19,6 +20,7 @@ import * as CommonModules from './common';
     ...Object.values(AdminModules),
     ...Object.values(ManagerModules),
     ...Object.values(CommonModules),
+    BcryptModule,
   ],
   controllers: [AppController],
   providers: [AppService],
