@@ -53,13 +53,13 @@ export class StorageService {
 
   async findOne(id: number) {
     const storage = await this.storageRepository.findOne({
-      where: { id_storage: id },
+      where: { id_storage: id, active: true },
       relations: {
         branch: true,
       },
     });
 
-    if (!storage || !storage.active) {
+    if (!storage) {
       throw new BadRequestException(
         `Storage not found in database with id:${id}`,
       );
