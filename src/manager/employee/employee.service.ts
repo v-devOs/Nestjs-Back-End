@@ -79,10 +79,6 @@ export class EmployeeService {
   async update(id: number, updateEmployeeDto: UpdateEmployeeDto) {
     const employee = await this.findOne(id);
 
-    if (!employee || !updateEmployeeDto) {
-      throw new BadRequestException(`Employee not found with id:${id}`);
-    }
-
     if (updateEmployeeDto.id_branch) {
       const branch = await this.branchService.findOne(
         updateEmployeeDto.id_branch,
@@ -99,7 +95,10 @@ export class EmployeeService {
       employee.storage = storage;
     }
 
-    return this.employeeRepository.save(employee);
+    return this.employeeRepository.save({
+      ...employee,
+      ...updateEmployeeDto,
+    });
   }
 
   async remove(id: number) {

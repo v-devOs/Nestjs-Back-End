@@ -18,8 +18,10 @@ export class ContactService {
   }
 
   async findAll() {
-    const contacts = await this.contactRepository.find();
-    return contacts.filter((contact) => contact.active);
+    const contacts = await this.contactRepository.find({
+      where: { active: true },
+    });
+    return contacts;
   }
 
   async findOne(id: number) {
@@ -32,7 +34,7 @@ export class ContactService {
         `Contact not found in database with id:${id}`,
       );
     }
-    return plainToClass(CreateContactDto, contact);
+    return contact;
   }
 
   async update(id: number, updateContactDto: UpdateContactDto) {
@@ -41,7 +43,7 @@ export class ContactService {
       ...contact,
       ...updateContactDto,
     });
-    return plainToClass(UpdateContactDto, updatedContact);
+    return updatedContact;
   }
 
   async remove(id: number) {

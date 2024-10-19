@@ -42,25 +42,16 @@ export class BranchService {
   }
 
   async findAll() {
-    const branches = await this.branchRepository.find();
+    const branches = await this.branchRepository.find({
+      where: { active: true },
+    });
 
-    return branches
-      .map((branch) => {
-        const newBranch = {
-          ...branch,
-          id_direction: branch.direction.id_direction,
-          id_contact: branch.contact.id_contact,
-        };
-
-        delete newBranch.direction;
-        delete newBranch.contact;
-        return newBranch;
-      })
-      .filter((branch) => branch.active);
+    return branches;
   }
 
   async findOne(id: number) {
     const branch = await this.branchRepository.findOne({
+      relations: ['contact', 'direction'],
       where: { id_branch: id, active: true },
     });
 
@@ -75,6 +66,23 @@ export class BranchService {
 
   async update(id: number, updateBranchDto: UpdateBranchDto) {
     const branch = await this.findOne(id);
+
+    if (updateBranchDto.id_contact) {
+      const newContact = await this.contactService.findOne(
+        updateBranchDto.id_contact,
+      );
+
+      branch.contact = newContact;
+    }
+
+    if (updateBranchDto.id_direction) {
+      const newDirection = await this.directionService.findOne(
+        updateBranchDto.id_direction,
+      );
+
+      branch.direction = newDirection;
+    }
+
     const updatedBranch = await this.branchRepository.save({
       ...branch,
       ...updateBranchDto,

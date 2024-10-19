@@ -19,8 +19,10 @@ export class DirectionService {
   }
 
   async findAll() {
-    const directions = await this.directionRepository.find();
-    return directions.filter((direction) => direction.active);
+    const directions = await this.directionRepository.find({
+      where: { active: true },
+    });
+    return directions;
   }
 
   async findOne(id: number) {
@@ -31,7 +33,7 @@ export class DirectionService {
     if (!direction || !direction.active) {
       throw new BadRequestException('Direction not found in database');
     }
-    return plainToClass(CreateDirectionDto, direction);
+    return direction;
   }
 
   async update(id: number, updateDirectionDto: UpdateDirectionDto) {

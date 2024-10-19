@@ -28,11 +28,11 @@ export class Branch {
   @Column()
   hour_end: number;
 
-  @OneToOne(() => Direction, { eager: true })
+  @OneToOne(() => Direction)
   @JoinColumn({ name: 'id_direction' })
   direction: Direction;
 
-  @OneToOne(() => Contact, { eager: true })
+  @OneToOne(() => Contact)
   @JoinColumn({ name: 'id_contact' })
   contact: Contact;
 }
