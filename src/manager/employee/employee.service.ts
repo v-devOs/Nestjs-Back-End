@@ -44,28 +44,16 @@ export class EmployeeService {
 
   async findAll() {
     const employees = await this.employeeRepository.find({
+      where: { active: true },
       relations: ['branch', 'storage'],
     });
 
-    return employees
-      .map((employee) => {
-        const newEmployee = {
-          ...employee,
-          id_branch: employee.branch.id_branch,
-          id_storage: employee.storage.id_storage,
-        };
-
-        delete newEmployee.branch;
-        delete newEmployee.storage;
-
-        return newEmployee;
-      })
-      .filter((employee) => employee.active);
+    return employees;
   }
 
   async findOne(id: number) {
     const employee = await this.employeeRepository.findOne({
-      where: { id_employee: id },
+      where: { id_employee: id, active: true },
       relations: ['branch', 'storage'],
     });
 
