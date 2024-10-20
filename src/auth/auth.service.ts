@@ -33,18 +33,26 @@ export class AuthService {
       },
     });
 
+    console.log({ user });
+
     if (!user) {
       throw new BadRequestException(`Error on search user, check credentials`);
     }
 
-    if (!this.bcryptService.comparePasswords(authDto.password, user.password)) {
+    const isValidPassword = this.bcryptService.comparePasswords(
+      authDto.password,
+      user.password,
+    );
+
+    if (!isValidPassword) {
       throw new UnauthorizedException(
-        `Error on search user, check credentials`,
+        `Error on credentials user, check credentials`,
       );
     }
 
     delete user.password;
     delete user.active;
+
     return {
       user: user,
       access_token: this.jwtService.sign(

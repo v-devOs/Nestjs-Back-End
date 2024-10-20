@@ -9,7 +9,7 @@ export class BcryptService {
     return newPassword;
   }
 
-  comparePasswords(password: string, hashPassword: string) {
-    return bcrypt.compareSync(password, hashPassword);
+  async comparePasswords(password: string, hashPassword: string) {
+    return await bcrypt.compare(password, hashPassword);
   }
 }
