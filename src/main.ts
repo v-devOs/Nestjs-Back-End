@@ -10,6 +10,9 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
-  await app.listen(8080);
+
+  const port = process.env.PORT || 8080; // Usar el puerto asignado o el 8080 como predeterminado
+  await app.listen(port);
+  console.log(`Application is running on: http://localhost:${port}`);
 }
 bootstrap();

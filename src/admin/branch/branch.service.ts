@@ -44,6 +44,7 @@ export class BranchService {
   async findAll() {
     const branches = await this.branchRepository.find({
       where: { active: true },
+      relations: ['direction', 'contact'],
     });
 
     return branches;
