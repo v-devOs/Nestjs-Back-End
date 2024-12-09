@@ -27,7 +27,9 @@ export class UserService {
       createUserDto.id_employee,
     );
 
-    const password = this.bcryptService.hashPassword(createUserDto.password);
+    const password = await this.bcryptService.hashPassword(
+      createUserDto.password,
+    );
     const newUser = await this.userRepository.save({
       ...createUserDto,
       employee,
@@ -83,7 +85,7 @@ export class UserService {
     }
 
     if (updateUserDto.password) {
-      const newPassword = this.bcryptService.hashPassword(
+      const newPassword = await this.bcryptService.hashPassword(
         updateUserDto.password,
       );
       user.password = newPassword;

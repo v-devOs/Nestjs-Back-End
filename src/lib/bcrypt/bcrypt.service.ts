@@ -3,8 +3,8 @@ import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class BcryptService {
-  hashPassword(password: string) {
-    const newPassword = bcrypt.hashSync(password);
+  async hashPassword(password: string) {
+    const newPassword = await bcrypt.hash(password, 2);
 
     return newPassword;
   }

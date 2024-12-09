@@ -18,6 +18,7 @@ export class CreateUserDto {
   @IsBoolean()
   @IsOptional()
   active: boolean;
+
   @IsNotEmpty()
   id_employee: number;
 }
